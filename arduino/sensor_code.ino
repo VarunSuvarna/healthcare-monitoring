@@ -18,13 +18,11 @@ const int mqtt_port = 1883;
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-// Buffer for JSON document
 StaticJsonDocument<200> doc;
 
 void setup() {
   Serial.begin(115200);
   
-  // Initialize sensor
   if (!particleSensor.begin(Wire, I2C_SPEED_FAST)) {
     Serial.println("MAX30105 was not found. Please check wiring/power.");
     while (1);
@@ -34,10 +32,9 @@ void setup() {
   particleSensor.setPulseAmplitudeRed(0x0A);
   particleSensor.setPulseAmplitudeGreen(0);
   
-  // Connect to WiFi
-  setupWiFi();
   
-  // Connect to MQTT
+  setupWiFi();
+
   client.setServer(mqtt_server, mqtt_port);
 }
 
@@ -47,17 +44,17 @@ void loop() {
   }
   client.loop();
 
-  // Read sensor data
+  
   long irValue = particleSensor.getIR();
   float temperature = particleSensor.getTemperature();
   int heartRate = getHeartRate();
   int spO2 = getSpO2();
   
-  // Get GPS coordinates
+  
   float latitude = gps.location.lat();
   float longitude = gps.location.lng();
   
-  // Create JSON payload
+  
   doc["deviceId"] = "DEVICE_001";
   doc["vitals"]["heartRate"] = heartRate;
   doc["vitals"]["temperature"] = temperature;
@@ -68,7 +65,6 @@ void loop() {
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);
   
-  // Publish to MQTT topic
   client.publish("health/vitals", jsonBuffer);
   
   delay(1000);
@@ -108,12 +104,10 @@ void reconnect() {
 }
 
 int getHeartRate() {
-  // Add heart rate calculation logic
-  return 75; // Placeholder
+  return 75; 
 }
 
 int getSpO2() {
-  // Add SpO2 calculation logic
-  return 98; // Placeholder
+  return 98; 
 }
 '''
